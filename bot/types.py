@@ -205,7 +205,7 @@ class Venue(DeJson):
 @attr.s(auto_attribs=True)
 class PollOption(DeJson):
     text: str
-    voter_count: str
+    voter_count: int
 
 
 @attr.s(auto_attribs=True)

@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('../')
 
-from bot import types
+from bot import types  # noqa: E420
 
 
 def test_User_de_json():
