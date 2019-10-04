@@ -274,6 +274,22 @@ class Bot(object):
             await self._make_request('getUpdates', payload)
         )
 
+    async def answer_callback_query(self,
+                                    callback_query_id: str,
+                                    text: o[str] = None,
+                                    show_alert: o[bool] = None,
+                                    url: o[str] = None,
+                                    cache_time: o[int] = None) -> bool:
+        payload = get_payload(
+            callback_query_id=callback_query_id,
+            text=text,
+            show_alert=show_alert,
+            url=url,
+            cache_time=cache_time
+        )
+
+        return await self._make_request('answerCallbackQuery', payload)
+
     async def answer_inline_query(
         self,
         inline_query_id: str,
@@ -293,7 +309,5 @@ class Bot(object):
             switch_pm_text=switch_pm_text,
             switch_pm_parameter=switch_pm_parameter
         )
-
-        print(payload)
 
         return await self._make_request('answerInlineQuery', payload)

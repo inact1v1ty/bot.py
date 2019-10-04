@@ -523,6 +523,14 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
 
 @attr.s(auto_attribs=True)
+class InlineQueryResultGame(InlineQueryResult):
+    id: str
+    game_short_name: str
+    reply_markup: o[InlineKeyboardMarkup] = None
+    type: str = 'game'
+
+
+@attr.s(auto_attribs=True)
 class InlineQueryResultCachedAudio(InlineQueryResult):
     id: str
     audio_file_id: str
