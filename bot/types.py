@@ -35,6 +35,11 @@ def de_list(converter):
 
 
 @attr.s(auto_attribs=True)
+class UpdateType(DeJson):
+    pass
+
+
+@attr.s(auto_attribs=True)
 class User(DeJson):
     id: int
     is_bot: bool
@@ -209,7 +214,7 @@ class PollOption(DeJson):
 
 
 @attr.s(auto_attribs=True)
-class Poll(DeJson):
+class Poll(UpdateType):
     id: str
     question: str
     options: typing.List[PollOption] = attr.ib(
@@ -226,7 +231,7 @@ class LoginUrl(DeJson):
     request_write_access: o[bool] = None
 
 
-@attr.s
+@attr.s(auto_attribs=True)
 class CallbackGame(DeJson):
     pass
 
@@ -253,7 +258,7 @@ class InlineKeyboardMarkup(DeJson):
 
 
 @attr.s(auto_attribs=True)
-class Message(DeJson):
+class Message(UpdateType):
     message_id: int
     from_user: User = attr.ib(converter=User.de_json)
     date: int
@@ -354,7 +359,7 @@ class ReplyKeyboardMarkup(DeJson):
 
 
 @attr.s(auto_attribs=True)
-class CallbackQuery(DeJson):
+class CallbackQuery(UpdateType):
     id: str
     from_user: User = attr.ib(converter=User.de_json)
     chat_instance: str
@@ -433,3 +438,156 @@ class InputMediaDocument(InputMedia):
     caption: o[str] = None
     parse_mode: o[str] = None
     type: str = 'document'
+
+
+@attr.s(auto_attribs=True)
+class InlineQuery(UpdateType):
+    id: str
+    from_user: User = attr.ib(converter=User.de_json)
+    query: str
+    offset: str
+    location: o[Location] = attr.ib(default=None, converter=Location.de_json)
+
+
+@attr.s(auto_attribs=True)
+class InputMessageContent(object):
+    pass
+
+
+@attr.s(auto_attribs=True)
+class InputTextMessageContent(object):
+    message_text: str
+    parse_mode: o[str] = None
+    disable_web_page_preview: o[bool] = None
+
+
+@attr.s(auto_attribs=True)
+class InputLocationMessageContent(object):
+    latitude: float
+    longitude: float
+    live_period: o[int] = None
+
+
+@attr.s(auto_attribs=True)
+class InputVenueMessageContent(object):
+    latitude: float
+    longitude: float
+    title: str
+    address: str
+    foursquare_id: o[str] = None
+    foursquare_type: o[str] = None
+
+
+@attr.s(auto_attribs=True)
+class InputContactMessageContent(object):
+    phone_number: str
+    first_name: str
+    last_name: o[str] = None
+    vcard: o[str] = None
+
+
+@attr.s(auto_attribs=True)
+class InlineQueryResult(object):
+    pass
+
+
+@attr.s(auto_attribs=True)
+class InlineQueryResultArticle(InlineQueryResult):
+    id: str
+    title: str
+    input_message_content: InputMessageContent
+    reply_markup: o[InlineKeyboardMarkup] = None
+    url: o[str] = None
+    hide_url: o[bool] = None
+    description: o[str] = None
+    thumb_url: o[str] = None
+    thumb_width: o[int] = None
+    thumb_height: o[int] = None
+    type: str = 'article'
+
+
+@attr.s(auto_attribs=True)
+class InlineQueryResultPhoto(InlineQueryResult):
+    id: str
+    photo_url: str
+    thumb_url: str
+    photo_width: o[int] = None
+    photo_height: o[int] = None
+    title: o[str] = None
+    description: o[str] = None
+    caption: o[str] = None
+    parse_mode: o[str] = None
+    reply_markup: o[InlineKeyboardMarkup] = None
+    input_message_content: o[InputMessageContent] = None
+    type: str = 'photo'
+
+
+@attr.s(auto_attribs=True)
+class InlineQueryResultCachedAudio(InlineQueryResult):
+    id: str
+    audio_file_id: str
+    caption: o[str] = None
+    parse_mode: o[str] = None
+    reply_markup: o[InlineKeyboardMarkup] = None
+    input_message_content: o[InputMessageContent] = None
+    type: str = 'audio'
+
+
+@attr.s(auto_attribs=True)
+class Update(DeJson):
+    update_id: int
+    message: o[Message] = attr.ib(
+        default=None, converter=Message.de_json
+    )
+    edited_message: o[Message] = attr.ib(
+        default=None, converter=Message.de_json
+    )
+    channel_post: o[Message] = attr.ib(
+        default=None, converter=Message.de_json
+    )
+    edited_channel_post: o[Message] = attr.ib(
+        default=None, converter=Message.de_json
+    )
+    inline_query: o[InlineQuery] = attr.ib(
+        default=None, converter=InlineQuery.de_json
+    )
+    # chosen_inline_result: o[ChosenInlineResult] = attr.ib(
+    #    default=None, converter=ChosenInlineResult.de_json
+    # )
+    chosen_inline_result: o[typing.Any] = attr.ib(
+        default=None
+    )
+    callback_query: o[CallbackQuery] = attr.ib(
+        default=None, converter=CallbackQuery.de_json
+    )
+    # shipping_query: o[ShippingQuery] = attr.ib(
+    #    default=None, converter=ShippingQuery.de_json
+    # )
+    shipping_query: o[typing.Any] = attr.ib(
+        default=None
+    )
+    # pre_checkout_query: o[PreCheckoutQuery] = attr.ib(
+    #    default=None, converter=PreCheckoutQuery.de_json
+    # )
+    pre_checkout_query: o[typing.Any] = attr.ib(
+        default=None
+    )
+    poll: o[Poll] = attr.ib(
+        default=None, converter=Poll.de_json
+    )
+
+
+print(Update.__init__.__annotations__)
+
+
+@attr.s(auto_attribs=True)
+class WebhookInfo(DeJson):
+    url: str
+    has_custom_certificate: bool
+    pending_update_count: int
+    last_error_date: o[int] = None
+    last_error_message: o[str] = None
+    max_connections: o[int] = None
+    allowed_updates: typing.List[str] = attr.ib(
+        default=None, converter=de_list(str)
+    )

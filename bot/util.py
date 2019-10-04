@@ -1,3 +1,6 @@
+import attr
+import typing
+
 
 class ApiException(Exception):
     """
@@ -17,3 +20,34 @@ class ApiException(Exception):
         )
         self.function_name: str = function_name
         self.result = result
+
+
+@attr.s(auto_attribs=True)
+class Handler(object):
+    function: typing.Callable
+
+
+def attr_filter(a: attr.Attribute, value):
+    return value is not None
+
+
+def get_dict(data):
+    if attr.has(data):
+        return attr.asdict(data, recurse=True, filter=attr_filter)
+    elif type(data) == list:
+        res = []
+        for item in data:
+            res.append(get_dict(item))
+        return res
+    else:
+        return data
+
+
+def get_payload(**kwargs):
+    payload = {}
+
+    for key, value in kwargs.items():
+        if value is not None:
+            payload[key] = get_dict(value)
+
+    return payload
