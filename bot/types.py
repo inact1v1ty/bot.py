@@ -585,9 +585,6 @@ class Update(DeJson):
     )
 
 
-print(Update.__init__.__annotations__)
-
-
 @attr.s(auto_attribs=True)
 class WebhookInfo(DeJson):
     url: str
@@ -599,3 +596,13 @@ class WebhookInfo(DeJson):
     allowed_updates: typing.List[str] = attr.ib(
         default=None, converter=de_list(str)
     )
+
+
+@attr.s(auto_attribs=True)
+class SocksProxy(object):
+    socks_ver: str
+    host: str
+    port: int
+    user: str
+    password: str
+    rdns: bool

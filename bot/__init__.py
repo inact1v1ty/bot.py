@@ -15,8 +15,9 @@ TFunc = typing.Callable[[types.Message], None]
 
 
 class Bot(object):
-    def __init__(self, token: str):
-        self.session: aiohttp.ClientSession = aiohttp.ClientSession()
+    def __init__(self,
+                 token: str,
+                 proxy: o[typing.Union[str, types.SocksProxy]] = None):
         self.token: str = token
         self.last_update_id = 0
         self.message_handlers = []
@@ -29,6 +30,41 @@ class Bot(object):
         self.shipping_query_handlers = []
         self.pre_checkout_query_handlers = []
         self.poll_state_handlers = []
+        self.proxy = None
+
+        if proxy is not None:
+            if isinstance(proxy, types.SocksProxy):
+                try:
+                    from aiohttp_socks import SocksConnector, SocksVer
+                    proxy: types.SocksProxy
+                    if proxy.socks_ver == 'SOCKS5':
+                        socks_ver = SocksVer.SOCKS5
+                    elif proxy.socks_ver == 'SOCKS4':
+                        socks_ver = SocksVer.SOCKS4
+                    else:
+                        print('Unsupported socks ver: {}'
+                              .format(proxy.socks_ver))
+                        raise AttributeError()
+                    connector = SocksConnector(
+                        socks_ver=socks_ver,
+                        host=proxy.host,
+                        port=proxy.port,
+                        username=proxy.user,
+                        password=proxy.password,
+                        rdns=proxy.rdns
+                    )
+                except ImportError:
+                    print('Need aiohttp_socks package to use socks proxy')
+            elif proxy.startswith('http://'):
+                self.proxy = proxy
+            else:
+                print('Unsupported proxy: {}'.format(proxy))
+        if connector:
+            self.session: aiohttp.ClientSession = aiohttp.ClientSession(
+                connector=connector
+            )
+        else:
+            self.session: aiohttp.ClientSession = aiohttp.ClientSession()
 
     async def __aenter__(self) -> 'Bot':
         return self
@@ -51,6 +87,7 @@ class Bot(object):
 
         async with self.session.post(request_url,
                                      json=payload,
+                                     proxy=self.proxy,
                                      timeout=timeout) as resp:
             text = await resp.text()
             if resp.status != 200:

@@ -471,6 +471,15 @@ class InlineQueryResultPhoto:
     ) -> None: ...
 
 
+class InlineQueryResultGame:
+    def __init__(
+        id: str,
+        game_short_name: str,
+        reply_markup: o[InlineKeyboardMarkup] = None,
+        type: str = 'game'
+    ) -> None: ...
+
+
 class InlineQueryResultCachedAudio:
     def __init__(
         id: str,
@@ -503,4 +512,15 @@ class WebhookInfo:
         last_error_message: o[str] = None,
         max_connections: o[int] = None,
         allowed_updates: typing.List[str] = None
+    ) -> None: ...
+
+
+class SocksProxy:
+    def __init__(
+        socks_ver: str,
+        host: str,
+        port: int,
+        user: str,
+        password: str,
+        rdns: bool
     ) -> None: ...
